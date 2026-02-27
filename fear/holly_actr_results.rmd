@@ -15,8 +15,68 @@ This is an R Markdown document. Markdown is a simple formatting syntax for autho
 When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
 
 ```{r cars}
-summary(cars)
+orig <- read_csv("hollysdata_nil.csv")
+orig %>% filter(repetition==1) %>% group_by(subject, clinicalStatus) %>% summarise(N = n(), RT=mean(RT)) -> orig_avg
+recovered <- read_csv("holly_model_comparison_summary.csv")
+names(recovered)[1] <- "subject"
+data <- orig_avg %>% left_join(recovered, by = c("subject"))
 ```
+
+```{r, fig.width=5, fig.height=5}
+
+data %>% 
+  pivot_longer(cols = c("d", "phi", "c", "w1"), names_to = "parameter", values_to = "value") -> data_long
+data_long %>% 
+  ggplot(aes(x=clinicalStatus, y=value, col=clinicalStatus)) +
+  scale_color_aaas() +
+  geom_point(alpha=0.5) +
+  facet_wrap(~parameter, scales="free_y") +
+  geom_boxplot(alpha=0.1) +
+  geom_signif(
+    comparisons = list(c("HC", "MCI")),
+    col="black",
+    map_signif_level = TRUE, textsize = 3
+  ) +
+  theme_minimal() +
+  theme(legend.position ="bottom",
+        
+    strip.text.x = element_text(margin = margin(b = 10, unit = "pt")), # Increase bottom margin
+    strip.text.y = element_text(margin = margin(r = 10, unit = "pt"))  # Increase right margin (if faceting by rows)
+  )
+  labs(title="Model Parameters by Clinical Status",
+       x="Clinical Status",
+       y="Parameter Value")
+```
+
+```{r, fig.width=4, fig.height=4}
+ggplot(data, aes(x=p, y=phi, col=clinicalStatus)) +
+  scale_color_aaas() +
+  geom_point(alpha=0.5) +
+  theme_minimal() +
+  theme(legend.position ="bottom") +
+  labs(title="Parameter Correlations",
+       x="FEAR Decay (d)",
+       y="ACT-R phi (phi)")
+```
+
+```{r}
+variables <- c("c", "phi", "t0_actr", "F_actr", "d", "w1", "t0_fear", "F_fear")
+library(corrplot)
+library(Hmisc)
+R <-  data[variables] %>% as.matrix() %>% rcorr(type="pearson") 
+
+corrplot(R$r, method = "circle",  diag = F, 
+         type = "full", tl.col = "black", tl.srt = 45, number.cex = 0.5,
+         p.mat = R$P, sig.level = 0.05, insig = "pch", pch=".", tl.cex=1,
+         col=colorRampPalette(c("royalblue4", "ivory1", "firebrick4"))(200),
+         cl.align.text = "l", cl.cex=1,
+         addgrid.col="white",
+         title = "Correlation Between Parameters",
+         mar=c(0,0,1,0))
+
+
+```
+    
 
 ## Including Plots
 
