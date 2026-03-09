@@ -1,0 +1,218 @@
+---
+title: "hollys"
+output: html_document
+date: "2026-02-26"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+orig <- read_csv("newdata.csv")
+orig %>% filter(type=="study") %>% group_by(subj) %>% summarise(N = n(), RT=mean(RT)) -> orig_avg
+recovered <- read_csv("slimstampen_model_comparison_summary.csv")
+names(recovered)[1] <- "subj"
+data <- orig_avg %>% left_join(recovered, by = c("subj"))
+```
+
+
+```{r}
+variables <- c("actr_c", 
+               #"actr_phi", 
+               "actr_t0", 
+               "actr_F", 
+               "fear_d", 
+               #"fear_w1", 
+               "fear_t0", 
+               "fear_F")
+library(corrplot)
+library(Hmisc)
+R <-  data[variables] %>% as.matrix() %>% rcorr(type="pearson") 
+
+corrplot(R$r, method = "circle",  diag = F, 
+         type = "full", tl.col = "black", tl.srt = 45, number.cex = 0.5,
+         p.mat = R$P, sig.level = 0.05, insig = "pch", pch=".", tl.cex=1,
+         col=colorRampPalette(c("royalblue4", "ivory1", "firebrick4"))(200),
+         cl.align.text = "l", cl.cex=1,
+         addgrid.col="white",
+         title = "Correlation Between Parameters",
+         mar=c(0,0,1,0))
+
+
+```
+    
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r, fig.width=10, fig.height=10}
+pred <- read_csv("slimstampen_trial_predictions.csv")%>% mutate(RT = RT/1000)
+
+pred %>% pivot_longer(cols = c("actr_pred_RT", "fear_pred_RT"), names_to = "model", values_to = "predicted_RT") %>%
+  filter(RT < 6) %>%
+  ggplot(aes(x=RT, y=predicted_RT, col=model)) +
+  scale_color_aaas() +
+  geom_point(alpha=0.5, size=0.1) +
+  facet_wrap(~subj, scales="free") +
+  stat_smooth(method="lm", se=T, linewidth=0.5, linetype="dashed") +
+  theme_minimal() +
+  theme(legend.position ="bottom") +
+  labs(title="Predicted vs Actual RT",
+       x="Actual RT",
+       y="Predicted RT")
+```
+
+```{r}
+pred %>% pivot_longer(cols = c("actr_pred_RT", "fear_pred_RT"), names_to = "model", values_to = "predicted_RT") %>%
+group_by(subj, model) %>%
+  summarise(cor = cor(RT, predicted_RT)) %>%
+  ggplot(aes(x=model, y=cor, fill=model)) +
+  geom_boxplot(alpha=0.5) +
+  ggsignif::geom_signif(comparisons = list(c("actr_pred_RT", "fear_pred_RT")), 
+                     test = "t.test", 
+                     map_signif_level = TRUE, 
+                     tip_length = 0.01) +
+  scale_fill_aaas() +
+  theme_minimal() +
+  theme(legend.position ="bottom") +
+  labs(title="Correlation of Predicted vs Actual RT by Model",
+       x="Model",
+       y="Correlation (r)")
+```
+
+```{r}
+pred %>% pivot_longer(cols = c("actr_phi", "actr_c", "actr_t0", "fear_w1", "fear_d", "fear_t0"), names_to = "parameter", values_to = "value") %>%
+  group_by(parameter, subj, item) %>%
+  summarise(mean_value = mean(value)) %>%
+  ggplot(aes(x=mean_value, fill = parameter)) +
+  scale_fill_aaas() +
+  geom_histogram(col="white", alpha=0.5, bins = 8) +
+  facet_wrap(~parameter, scales="free") +
+  theme_minimal() 
+
+```
+
+```{r}
+pred %>% group_by(subj, item) %>%
+  filter(repetition == max(repetition)) %>%
+  filter(repetition > 2) %>%
+  summarise(mean_actr_phi = mean(actr_phi), 
+            mean_ml_phi = mean(alpha),
+            mean_fear_w1 = mean(fear_w1)) %>%
+  pivot_longer(cols = c("mean_actr_phi", "mean_fear_w1"), names_to = "parameter", values_to = "mean_value") %>%
+  ggplot(aes(y=mean_value, x=mean_ml_phi)) +
+  geom_point(alpha=0.5) +
+  facet_wrap(~parameter, scales="free_y") +
+  stat_smooth(method="lm", se=T, linewidth=0.5, linetype="dashed") +
+  theme_minimal() +
+  labs(title="Mean ACT-R phi vs Mean FEAR w1",
+       x="Mean ML phi",
+       y="Mean Value")
+```
+
+```{r}
+pred %>% group_by(subj, item) %>%
+  filter(repetition == max(repetition)) %>%
+  filter(repetition > 2) %>%
+  group_by(subj) %>%
+  summarise(sof = mean(alpha)) %>%
+  left_join(recovered, by = "subj") %>%
+  ggplot(aes(x=fear_d, y=sof)) +
+  geom_point(alpha=0.5) +
+  stat_smooth(method="lm", se=T, linewidth=0.5) +
+  theme_minimal() 
+              
+```
+
+```{r}
+pred %>% group_by(subj, item) %>%
+  filter(repetition == max(repetition)) %>%
+  
+  pivot_wider(id_cols = c(subj), names_from = item, values_from = actr_phi) %>% 
+  select(-subj) %>%
+  as.matrix() %>% rcorr(type="spearman") -> R
+
+print(mean(R$r))
+  
+corrplot(R$r, method = "circle",  diag = F, 
+         type = "full", tl.col = "black", tl.srt = 45, number.cex = 0.5,
+         p.mat = R$P, sig.level = 0.05, insig = "pch", pch=".", tl.cex=1,
+         col=colorRampPalette(c("royalblue4", "ivory1", "firebrick4"))(200),
+         cl.align.text = "l", cl.cex=1,
+         addgrid.col="white",
+         title = "Correlation Between FEAR w1 Across Items",
+         mar=c(0,0,1,0))
+```
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+
+ACTR: phi, c, s by subject
+FEAR: d, w1, s by subject
+FEAR wins LL/AIC/BIC, LL is good in all ss, no diff in correlations, but ACTR is better
+
+ACTR: phi, c, t0 by subject
+FEAR: d, w1, t0 by subject
+FEAR wins LL/AIC/BIC, LL is good in all ss, no diff in correlations.but FEAR is better (0.32)
+
+ACTR: phi, c, F by subject
+FEAR: d, w1, F by subject
+FF wins LL/AIC/BIC (33/35), LL is good in all ss, no diff in correlations.but FEAR is better (0.34)
+
+ACTR: phi, c, tau by subject
+FEAR: d, w1, tau by subject
+FEAR wins LL/AIC/BIC (22/35), LL is good in all ss, ACT-R much better corr than fear (0.33 > 0.1).
+
+ACTR: phi, c, tau, F, t0 by subject
+FEAR: d, w1, tau, F, t0 by subject
+FEAR wins LL/AIC/BIC (23/35), LL is good in all ss, ACT-R much better corr than fear (0.33 > 0.1).
+
+ACTR: phi, c, F, t0 by subject
+FEAR: d, w1, F, t0 by subject
+FEAR wins LL/AIC/BIC: (27/35) subjects, LL good in all ss, FEAR slightly better corr (0.34 > 0.32)
+
+ACTR: phi, c, tau, t0 by subject
+FEAR: d, w1, tau, t0 by subject
+FEAR wins LL/AIC/BIC (28/35), LL good in all, no diff in correlations, ACT-R better corr (0.32 > 0.20)
+
+ACTR: phi, c, tau, F by subject
+FEAR: d, w1, tau, t by subject
+FEAR wins LL/AIC/BIC (26/35), LL good in most, ACT-R significant better corr (0.34 > 0.11)
+
+-- by fact ---
+
+ACTR: c, t0 by subject, phi by fact
+FEAR: w1, t0 by subject, d by fact
+FEAR wins LL/AIC/BIC, LL is good in all ss, no diff in correlations.but FEAR is better (0.32)
+
+
+ACTR: c, s by subject; phi by fact
+FEAR: d, s by subject; w1 by fact
+ACTR wins LL/AIC/BIC, LL is good in all ss, ACT-R RT correlations are better
+
+ACTR: c by subject; phi by fact
+FEAR: d by subject; w1 by fact
+ACTR wins LL/AIC/BIC, LL is good in all ss, ACT-R RT correlations are better
+
+ACTR: c, t0 by subject; phi by fact
+FEAR: d, t0 by subject; w1 by fact
+FEAR wins LL/AIC/BIC, LL is good in all ss, no diff correlations are better
+
+ACTR: c, by subject; phi, t0 by fact
+FEAR: d, y subject; w1, t0 by fact
+FEAR wins LL/AIC/BIC, LL is good in all ss, no diff correlations 
+
+ACTR: c constant 0.5, t0 by fact; phi by subject
+FEAR: w1 constant 2.6, t0 by fact; w1 by subject
+FEAR barely wins LL/AIC/BIC, LL is good in all ss, no diff correlations ACT-R better
+
+ACTR: c  0.5, phi by fact
+FEAR: d by subject, w1 by fact
+FEAR barely wins LL/AIC/BIC, LL is good in all ss, no diff correlations ACT-R better

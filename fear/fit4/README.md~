@@ -1,0 +1,11 @@
+
+
+
+Trials: 4994 → 4877 (117 outliers removed)
+Subjects: 35 | Workers: 8 | Restarts: 15
+
+ACT-R free:  c [subject], phi [subject], t0 [subject]
+ACT-R fixed: F=1, tau=-0.8, s=0.25
+
+FE-ACT-R free:  d [subject], w1 [subject], t0 [subject]
+FE-ACT-R fixed: F=1, tau=-0.8, s=0.25
