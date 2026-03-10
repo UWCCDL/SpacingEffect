@@ -153,35 +153,42 @@ corrplot(R$r, method = "circle",  diag = F,
 ```
 Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
 
-
+# Fit 5
 ACTR: phi, c, s by subject
 FEAR: d, w1, s by subject
 FEAR wins LL/AIC/BIC, LL is good in all ss, no diff in correlations, but ACTR is better
 
+# Fit 4
 ACTR: phi, c, t0 by subject
 FEAR: d, w1, t0 by subject
 FEAR wins LL/AIC/BIC, LL is good in all ss, no diff in correlations.but FEAR is better (0.32)
 
+# Fit 6
 ACTR: phi, c, F by subject
 FEAR: d, w1, F by subject
 FF wins LL/AIC/BIC (33/35), LL is good in all ss, no diff in correlations.but FEAR is better (0.34)
 
+# Fit 7
 ACTR: phi, c, tau by subject
 FEAR: d, w1, tau by subject
 FEAR wins LL/AIC/BIC (22/35), LL is good in all ss, ACT-R much better corr than fear (0.33 > 0.1).
 
+# Fit 8
 ACTR: phi, c, tau, F, t0 by subject
 FEAR: d, w1, tau, F, t0 by subject
 FEAR wins LL/AIC/BIC (23/35), LL is good in all ss, ACT-R much better corr than fear (0.33 > 0.1).
 
+# Fit 9
 ACTR: phi, c, F, t0 by subject
 FEAR: d, w1, F, t0 by subject
 FEAR wins LL/AIC/BIC: (27/35) subjects, LL good in all ss, FEAR slightly better corr (0.34 > 0.32)
 
+# Fit 10
 ACTR: phi, c, tau, t0 by subject
 FEAR: d, w1, tau, t0 by subject
 FEAR wins LL/AIC/BIC (28/35), LL good in all, no diff in correlations, ACT-R better corr (0.32 > 0.20)
 
+# Fit 11
 ACTR: phi, c, tau, F by subject
 FEAR: d, w1, tau, t by subject
 FEAR wins LL/AIC/BIC (26/35), LL good in most, ACT-R significant better corr (0.34 > 0.11)
@@ -190,8 +197,51 @@ FEAR wins LL/AIC/BIC (26/35), LL good in most, ACT-R significant better corr (0.
 
 ACTR: c, t0 by subject, phi by fact
 FEAR: w1, t0 by subject, d by fact
-FEAR wins LL/AIC/BIC, LL is good in all ss, no diff in correlations.but FEAR is better (0.32)
+ACTR wins LL/AIC/BIC
 
+# Fit 12
+ACTR: c, t0 by subject, phi by fact
+FEAR: d, t0 by subject, w1 by fact
+FEAR wins LL/AIC/BIC (23/35), no difference in corr (~ .5)
+
+# Fit 15
+ACTR: c, tau by subject, phi by fact
+FEAR: d, tau by subject, w1 by fact
+ACT-R wins LL/AIC/BIC (9/35), mean = 6.66, ACT-R sign better corr (~ .5 > 0.1)
+
+# Fit 13
+ACTR: c, F by subject, phi by fact
+FEAR: d, F by subject, w1 by fact
+FE-ACT-R wins AIC: 20/35 subjects, no diff in corr (~.5)
+
+
+# Fit 14
+ACTR: c, F, t0 by subject, phi by fact
+FEAR: d, F, t0 by subject, w1 by fact
+FE-ACT-R wins AIC: 24/35 subjects (-6.5), noi diff in corr (~5), ACTR slightly better 
+
+# Fit 16
+ACTR: c, F, tau by subject, phi by fact
+FEAR: d, F, tau by subject, w1 by fact
+ACT-R wins LL/AIC/BIC (5/35), mean = 12.66, ACT-R better corr (~ .5 > 0.1)
+
+# Fit 17
+ACTR: c, F, t0, tau by subject, phi by fact
+FEAR: d, F, t0, tau by subject, w1 by fact
+ACT-R wins LL/AIC/BIC (6/35), mean = 11.76, ACT-R better corr (~ .58 > 0.23)
+
+# Fit 18
+ACTR: c, t0, tau by subject, phi by fact
+FEAR: d, t0, tau by subject, w1 by fact
+FE-ACT-R wins AIC: 23/35 subjects, Mean ΔBIC (FE - ACT-R): -6.21
+
+# Fit 19
+ACTR: c, t0, s by subject, phi by fact
+FEAR: d, t0, s by subject, w1 by fact
+FE-ACT-R wins AIC: 22/35 subjects, Mean ΔBIC (FE - ACT-R): -0.81
+
+
+- other
 
 ACTR: c, s by subject; phi by fact
 FEAR: d, s by subject; w1 by fact

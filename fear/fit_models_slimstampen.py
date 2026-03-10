@@ -44,23 +44,23 @@ ACTR_PARAMS = {
     #'F': {'bounds': (0.5, 1.5), 'level': 'subject'},
     'tau': -0.8,
     #'tau': {'bounds':(-2, 0), 'level':'subject'},
-    's':   0.25,
-    #'s': {'bounds': (0.1, 1),   'level': 'subject'},
+    #'s':   0.25,
+    's': {'bounds': (0.1, 1),   'level': 'subject'},
 }
 
 FEAR_PARAMS = {
     #'d':   {'bounds': (0.1, 0.75),   'level': 'subject'},
-    'd':   {'bounds': (0.1, 0.75),   'level': 'fact'},
-    'w1':  {'bounds': (0, 5),  'level': 'subject'}, # 0-10
+    'd':   {'bounds': (0.1, 0.75),   'level': 'subject'},
+    'w1':  {'bounds': (0, 5),  'level': 'fact'}, # 0-10
     #'w1': 2.6,
-    #'t0': 0.3,
+    # 't0': 0.3,
     't0': {'bounds':(0.3, 0.8), 'level': 'subject'},
     #'F':   {'bounds': (0.5, 1.5), 'level': 'subject'},
     'F': 1,
     'tau': -0.8,
     #'tau': {'bounds':(-2, 0), 'level':'subject'},
-    's':   0.25,
-    #'s': {'bounds': (0.1, 1),   'level': 'subject'},
+    #'s':   0.25,
+    's': {'bounds': (0.1, 1),   'level': 'subject'},
 }
 
 
